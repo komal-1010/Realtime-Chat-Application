@@ -101,13 +101,13 @@ app.post('/register', async (req, res) => {
         res.status(500).json("error", 'server error')
     }
 })
-app.post('/login', (req, res) => {
+app.post('/login',async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: "Email and Password is required" })
         }
-        const user = usercollection.findOne({ email })
+        const user = await usercollection.findOne({ email })
         if (!user) {
             return res.status(401).json({ error: 'Email and Password is invalid' })
         }
