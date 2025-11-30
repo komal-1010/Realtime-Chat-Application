@@ -24,7 +24,7 @@ const collection = db.collection('documents')
 
 const usercollection = db.collection('users')
 const embedder = new OpenAIEmbeddings({
-  openAIApiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY,
   model: "openai/text-embedding-3-small",
   configuration: {
     baseURL: "https://openrouter.ai/api/v1",
@@ -37,7 +37,7 @@ const embedder = new OpenAIEmbeddings({
 
 
 const model = new ChatOpenAI({
-  openAIApiKey: process.env.OPENROUTER_API_KEY,   // MUST be this key
+  apiKey: process.env.OPENROUTER_API_KEY,   // MUST be this key
   model: "openai/gpt-4.1-mini",
   configuration: {
     baseURL: "https://openrouter.ai/api/v1",
