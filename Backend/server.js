@@ -57,7 +57,6 @@ Answer clearly:`]
 const ragChain = new RunnableSequence([
     async (input) => {
         const userId = input.userId
-        await client.connect()
         const embedding = await embedder.embedQuery(input.question)
         const docs = await collection.aggregate([
             { $match: { userId } },
@@ -70,7 +69,6 @@ const ragChain = new RunnableSequence([
                 }
             }
         ]).toArray()
-        await client.close()
         return {
             question: input.question,
             history: input.history?.map(m => `${m.sender}:${m.text}`).join("\n") || "",
@@ -256,9 +254,12 @@ app.post('/ask/stream', auth, async (req, res) => {
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader('Cache-Control', 'no-cache');
         res.flushHeaders();
-        const stream = await model.stream(question);
+        const stream = await model.stream([{
+            role:"user",content:question
+        }]);
         for await (const chunk of stream) {
-            res.write(chunk.concat ?? "")
+            const text=chunk?.delta?.content||""
+           if(text) res.write(text)
         }
         res.end();
     } catch (err) {
