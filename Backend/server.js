@@ -24,28 +24,32 @@ const collection = db.collection('documents')
 
 const usercollection = db.collection('users')
 const embedder = new OpenAIEmbeddings({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  model: "openai/text-embedding-3-small",
-  configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
-    defaultHeaders: {
-      "HTTP-Referer": "http://localhost:3000",   // required!!!
-      "X-Title": "My AI App"
+    apiKey: process.env.OPENROUTER_API_KEY,
+    openAIApiKey: process.env.OPENROUTER_API_KEY,
+    openaiApiKey: process.env.OPENROUTER_API_KEY,
+    model: "openai/text-embedding-3-small",
+    configuration: {
+        baseURL: "https://openrouter.ai/api/v1",
+        defaultHeaders: {
+            "HTTP-Referer": "http://localhost:3000",   // required!!!
+            "X-Title": "My AI App"
+        }
     }
-  }
 });
 
 
 const model = new ChatOpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,   // MUST be this key
-  model: "openai/gpt-4.1-mini",
-  configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
-    defaultHeaders: {
-      "HTTP-Referer": "https://your-domain.com",  // required
-      "X-Title": "My App"
+    apiKey: process.env.OPENROUTER_API_KEY,
+    openAIApiKey: process.env.OPENROUTER_API_KEY,
+    openaiApiKey: process.env.OPENROUTER_API_KEY,
+    model: "openai/gpt-4.1-mini",
+    configuration: {
+        baseURL: "https://openrouter.ai/api/v1",
+        defaultHeaders: {
+            "HTTP-Referer": "https://your-domain.com",  // required
+            "X-Title": "My App"
+        }
     }
-  }
 });
 
 
@@ -112,7 +116,7 @@ app.post('/register', async (req, res) => {
         res.status(500).json("error", 'server error')
     }
 })
-app.post('/login',async (req, res) => {
+app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -147,15 +151,15 @@ const auth = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token provided" })
     try {
-        const decoded=jwt.verify(token,process.env.JWT_SECRET)
-        req.user={id:decoded.sub}
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = { id: decoded.sub }
         next();
-    }catch(err){
-        return res.status(401).json({error:'Invalid token'})
+    } catch (err) {
+        return res.status(401).json({ error: 'Invalid token' })
     }
 }
 //API endpoint
-app.post('/ask', auth,async (req, res) => {
+app.post('/ask', auth, async (req, res) => {
     try {
         const { question, chatId } = req.body
         const userId = req.user.id
@@ -194,7 +198,7 @@ app.post('/ask', auth,async (req, res) => {
     }
 })
 
-app.post('/upload', auth,upload.single("file"), async (req, res) => {
+app.post('/upload', auth, upload.single("file"), async (req, res) => {
     try {
         const file = req.file;
         const userId = req.user.id;
@@ -262,7 +266,7 @@ app.post('/upload', auth,upload.single("file"), async (req, res) => {
 
 
 // Add Streaming to Your Express.js API
-app.post('/ask/stream',auth, async (req, res) => {
+app.post('/ask/stream', auth, async (req, res) => {
     try {
         const { question } = req.body;
         res.setHeader("Content-Type", "text/event-stream");
@@ -279,7 +283,7 @@ app.post('/ask/stream',auth, async (req, res) => {
     }
 })
 
-app.post('/chat', auth,async (req, res) => {
+app.post('/chat', auth, async (req, res) => {
     const userId = req.user.id;
     const { title } = req.body;
     const chat = {
@@ -291,7 +295,7 @@ app.post('/chat', auth,async (req, res) => {
     const result = await db.collection("chats").insertOne(chat)
     res.json({ chatId: result.insertedId })
 })
-app.post('/chats/:chatId/messages',auth, async (req, res) => {
+app.post('/chats/:chatId/messages', auth, async (req, res) => {
     const { chatId } = req.params;
     const userId = req.user.id;
     const { role, text } = req.body;
@@ -310,18 +314,18 @@ app.post('/chats/:chatId/messages',auth, async (req, res) => {
     res.json({ success: true })
 })
 //get all chat sessions
-app.get('/chats',auth, async (req, res) => {
+app.get('/chats', auth, async (req, res) => {
     const chats = await db.collection('chats').find({ userId: req.user.id }).sort({ updatedAt: -1 }).toArray()
     res.json({ chats })
 })
 //load messages of chat 
-app.get("/chats/:chatId/messages",auth, async (req, res) => {
+app.get("/chats/:chatId/messages", auth, async (req, res) => {
     const { chatId } = req.params;
     const messages = await db.collection("messages").find({ chatId }).sort({ createdAt: -1 }).toArray()
     res.json({ messages })
 })
 //delete the chats
-app.delete("/chats/:chatId",auth, async (req, res) => {
+app.delete("/chats/:chatId", auth, async (req, res) => {
     const { chatId } = req.params;
     const userId = req.user.id;
     await db.collection("chats").deleteOne({ _id: new ObjectId(chatId), userId })
