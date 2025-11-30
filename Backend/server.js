@@ -24,33 +24,17 @@ const collection = db.collection('documents')
 
 const usercollection = db.collection('users')
 const embedder = new OpenAIEmbeddings({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    openAIApiKey: process.env.OPENROUTER_API_KEY,
-    openaiApiKey: process.env.OPENROUTER_API_KEY,
-    model: "openai/text-embedding-3-small",
-    configuration: {
-        baseURL: "https://openrouter.ai/api/v1",
-        defaultHeaders: {
-            "HTTP-Referer": "http://localhost:3000",   // required!!!
-            "X-Title": "My AI App"
-        }
-    }
+  model: "text-embedding-3-small",
+  openAIApiKey: process.env.OPENAI_API_KEY
 });
+
 
 
 const model = new ChatOpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    openAIApiKey: process.env.OPENROUTER_API_KEY,
-    openaiApiKey: process.env.OPENROUTER_API_KEY,
-    model: "openai/gpt-4.1-mini",
-    configuration: {
-        baseURL: "https://openrouter.ai/api/v1",
-        defaultHeaders: {
-            "HTTP-Referer": "https://your-domain.com",  // required
-            "X-Title": "My App"
-        }
-    }
+  model: "gpt-4.1-mini",
+  openAIApiKey: process.env.OPENAI_API_KEY
 });
+
 
 
 // Prompt template
