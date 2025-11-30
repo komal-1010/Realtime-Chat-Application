@@ -25,14 +25,14 @@ const collection = db.collection('documents')
 const usercollection = db.collection('users')
 const embedder = new OpenAIEmbeddings({
   model: "text-embedding-3-small",
-  openAIApiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 
 
 const model = new ChatOpenAI({
   model: "gpt-4.1-mini",
-  openAIApiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 
