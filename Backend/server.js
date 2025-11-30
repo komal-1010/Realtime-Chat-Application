@@ -37,11 +37,17 @@ const embedder = new OpenAIEmbeddings({
 
 
 const model = new ChatOpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    model: "openai/gpt-4.1-mini",
-    configuration: { baseURL: "https://openrouter.ai/api/v1" },
-    maxTokens: 200,
+  openAIApiKey: process.env.OPENROUTER_API_KEY,   // MUST be this key
+  model: "openai/gpt-4.1-mini",
+  configuration: {
+    baseURL: "https://openrouter.ai/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "https://your-domain.com",  // required
+      "X-Title": "My App"
+    }
+  }
 });
+
 
 // Prompt template
 const prompt = ChatPromptTemplate.fromMessages([
